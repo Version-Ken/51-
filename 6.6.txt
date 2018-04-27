@@ -1,0 +1,23 @@
+#include<reg51.h>
+#define uchar unsigned char
+#define uint unsigned int
+sbit k1=P3^2;
+sbit k2=P3^3;
+sbit m1=P0^0;
+sbit m2=P0^1;
+void main()
+{
+	while(1)
+	{
+		if(k1==0)
+		{
+			m1=1;
+			m2=0;
+		}
+		if(k2==0)
+		{
+			m1=1;
+			m2=1;
+		}		
+	}
+}

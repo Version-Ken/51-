@@ -1,0 +1,213 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar bai,shi,ge;
+sbit b=P3^6;
+uint count,a,lcd_flag=0;
+uchar set_num=8,shi_num,ge_num;
+bit b_kaiguan,f,k_flag=0;
+sbit k5=P1^4;
+sbit k6=P1^5;
+sbit k7=P1^6;
+sbit k8=P1^7;
+bit k5_last=1,k5_now=1;
+bit k6_last=1,k6_now=1;
+bit k7_last=1,k7_now=1;
+bit k8_last=1,k8_now=1;
+void init();
+void fenjie();
+void display1();
+void display2();
+void scan_key1();
+void scan_key2();
+void main()
+{
+	init();
+	while(1)
+	{
+		if(k_flag==0)
+		{	
+			display1();
+			if(lcd_flag==1)
+			{
+				lcd_pos(2,7);
+				lcdwrite_zm('G');
+				lcdwrite_zm('O');	
+			}
+			if(lcd_flag==2)
+			{
+				lcd_pos(2,7);
+				lcdwrite_zm('P');
+				lcdwrite_zm('A');
+				lcdwrite_zm('U');
+				lcdwrite_zm('S');
+				lcdwrite_zm('E');	
+			}
+			if(lcd_flag==3)
+			{
+			 	lcd_pos(2,7);
+				lcdwrite_zm('S');
+				lcdwrite_zm('T');
+				lcdwrite_zm('O');
+				lcdwrite_zm('P');
+			}
+			scan_key1();
+			count=TH0*256+TL0;
+			fenjie();		
+			if(count%set_num==0&&count!=0)
+			{
+				if(b_kaiguan==0)
+				{
+					b_kaiguan=1;
+					TR1=1;
+				}
+			}
+			else if(f==0)
+			{
+				f=1;
+				b_kaiguan=0;
+			}
+		}
+		else if(k_flag==1)
+		{		
+			display2();
+			scan_key2();
+			fenjie();
+		}	
+	}
+}
+void init()
+{
+	TMOD=0X15;
+	TH1=(65536-5000)/256;
+	TL1=(65536-5000)/256;
+	EA=1;
+	ET1=1;
+	TR1=0;
+	TH0=0;
+	TL0=0;
+	TR0=0;
+	lcd_init();
+	lcd_pos(2,7);
+	lcdwrite_zm('S');
+	lcdwrite_zm('T');
+	lcdwrite_zm('O');
+	lcdwrite_zm('P');
+}
+void fenjie()
+{
+	bai=count/100;
+	shi=count%100/10;
+	ge=count%10;
+
+	shi_num=set_num/10;
+	ge_num=set_num%10;
+}
+void display1()
+{
+	lcd_pos(1,7);
+	lcdwrite_sz(bai);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+}
+void display2()
+{
+		lcd_pos(1,1);
+		lcdwrite_zm('s');
+		lcdwrite_zm('e');
+		lcdwrite_zm('t');
+		lcdwrite_zm('_');
+		lcdwrite_zm('n');
+		lcdwrite_zm('u');
+		lcdwrite_zm('m');
+		lcdwrite_zm(':');
+		
+		lcd_pos(2,8);
+		lcdwrite_sz(shi_num);
+		lcdwrite_sz(ge_num);
+}
+void scan_key1()
+{
+	k5_last=k5_now;
+	k5_now=k5;
+
+	k6_last=k6_now;
+	k6_now=k6;
+
+	k7_last=k7_now;
+	k7_now=k7;
+
+	k8_last=k8_now;
+	k8_now=k8;
+	 
+	if(k5_last==0&&k5_now==1)
+	{
+		TR0=1;
+		lcd_init();
+		lcd_flag=1;
+	}
+	if(k6_last==0&&k6_now==1)
+	{
+		TR0=0;
+		lcd_init();
+		lcd_flag=2;		
+	}
+	if(k7_last==0&&k7_now==1)
+	{
+		TR0=0;
+		TH0=0;
+		TL0=0;
+		lcd_init();
+		lcd_flag=3;	
+	}
+	if(k8_last==0&&k8_now==1)
+	{
+		k_flag=1;
+		lcd_init();
+	}
+}
+void scan_key2()
+{
+	k5_last=k5_now;
+	k5_now=k5;
+
+	k6_last=k6_now;
+	k6_now=k6;
+
+	k8_last=k8_now;
+	k8_now=k8;
+	 
+	if(k5_last==0&&k5_now==1)
+	{
+		set_num++;
+	}
+	if(k6_last==0&&k6_now==1)
+	{
+		set_num--;
+		if(set_num==0)
+			set_num=1;	
+	}
+	if(k8_last==0&&k8_now==1)
+	{
+		k_flag=0;
+		lcd_init();
+		TR0=0;
+		TH0=0;
+		TL0=0;
+		lcd_flag=3;
+	}
+}
+void timer() interrupt 3
+{
+	TH1=(65536-5000)/256;
+	TL1=(65536-5000)/256;
+	b=~b;
+	a++;	
+	if(a==200)
+	{
+		a=0;
+		TR1=0;
+		f=0;			
+	}
+}

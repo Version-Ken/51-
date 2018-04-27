@@ -1,0 +1,40 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar bai,shi,ge;
+uint count;
+void init();
+void fenjie();
+void display();
+void main()
+{
+	init();
+	while(1)
+	{
+		count=TH0*256+TL0;
+		fenjie();
+		display();	
+	}
+}
+void init()
+{
+	TMOD=0X05;
+	TH0=0;
+	TL0=0;
+	TR0=1;
+	lcd_init();
+}
+void fenjie()
+{
+	bai=count/100;
+	shi=count%100/10;
+	ge=count%10;
+}
+void display()
+{
+	lcd_pos(1,7);
+	lcdwrite_sz(bai);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+}

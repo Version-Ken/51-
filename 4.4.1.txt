@@ -1,0 +1,102 @@
+#include<reg52.h>
+#include<intrins.h>
+#define uchar unsigned char 
+#define uint unsigned int  
+sbit k5=P1^4;
+sbit k6=P1^5;
+sbit k7=P1^6;
+sbit k8=P1^7;
+void scan_key();
+void out_put();
+void delay(uint z);
+uint flag=0;
+uchar a=0xfe;
+uint count=0;
+void main()
+{
+	k5=1;
+	k6=1;
+	k7=1;
+	k8=1;
+	P0=a;
+	while(1)
+	{
+	 	scan_key();
+		out_put();
+	}
+}
+void delay(uint z)
+{
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);	
+}
+void out_put()
+{
+	if(flag==3)
+	{	
+		delay(20);
+		count++;
+		if(count==25)
+		{
+			a=_crol_(a,1);
+			P0=a;
+			count=0;
+		}
+	}
+	else if(flag==0)
+	{
+		P0=a;
+	}	
+}
+void scan_key()			 
+{
+ 	if(flag!=3)
+	{
+		if(k5==0)
+	{
+		delay(20);
+		if(k5==0)
+		{
+			if(flag==0)
+				flag=1;
+			else
+				flag=0;
+			while(k5==0);
+		}
+	}		
+	else if(k6==0)
+	{
+		delay(20);
+		if(k6==0)
+		{
+			if(flag==1)
+				flag=2;
+			else
+				flag=0;
+			while(k6==0);
+		}
+	}
+	else if(k7==0)
+	{
+		delay(20);
+		if(k7==0)
+		{
+		 	if(flag==2)
+				flag=3;
+			else
+				flag=0;
+			while(k7==0);
+		}		
+	}
+	}
+	else if(k8==0)
+	{
+		delay(20);
+		if(k8==0)
+		{
+			flag=0;
+			while(k8==0);
+		}
+	}
+}

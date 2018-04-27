@@ -1,0 +1,49 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar table1[]=("count:");
+sbit k1=P3^2;
+sbit k2=P3^3;
+uchar count=0,shi,ge;
+void fenjie(uchar count);
+void delay(uchar z);
+void main()
+{
+	lcd_init();
+	lcd_pos(1,1);
+	lcdwrite_string(table1);
+	fenjie();
+	lcd_pos(2,6);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+	while(1)
+	{	
+		if(k1==0)
+		{
+			delay(20);
+			if(k1==0)
+			{
+				count++;
+				if(count==21)
+					count=0; 
+				while(k1==0); 		
+			}
+			fenjie(count);
+			lcd_pos(2,6);
+			lcdwrite_sz(shi);
+			lcdwrite_sz(ge);
+		}
+	}
+}
+void fenjie(uchar count)
+{
+	shi=count/10;
+	ge=count%10;
+}
+void delay(uchar z)
+{
+	uchar x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}

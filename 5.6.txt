@@ -1,0 +1,132 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar table1[]=("count_1:");
+uchar table2[]=("count_2:");
+uchar table3[]=("count_3:");
+sbit k1=P3^2;
+sbit k2=P3^3;
+sbit k3=P3^4;
+uchar f=1,shi,ge,count_1=17,count_2=28,count_3=39;
+void fenjie(uchar c);
+void delay(uchar z);
+void main()
+{
+	lcd_init();
+	lcd_pos(1,1);
+	lcdwrite_string(table1);
+	fenjie(count_1);
+	lcd_pos(2,6);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+	while(1)
+	{	
+		if(k1==0)
+		{
+			delay(20);
+			if(k1==0)
+			{
+				f++;
+				if(f==4)
+					f=1;
+				switch(f)
+				{
+			     case 1:
+				{
+					lcd_pos(1,1);
+					lcdwrite_string(table1);
+					fenjie(count_1);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+
+				case 2:
+				{
+					lcd_pos(1,1);
+					lcdwrite_string(table2);
+					fenjie(count_2);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+
+				case 3:
+				{
+					lcd_pos(1,1);
+					lcdwrite_string(table3);
+					fenjie(count_3);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+			}
+			while(k1==0); 				
+		}  			
+	}
+				
+		if(k2==0)
+		{
+			delay(20);
+			if(k2==0)
+			{
+
+		switch(f)
+		{
+			case 1:
+				{
+					count_1--;
+					if(count_1==0)
+						count_1=1;
+					fenjie(count_1);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+
+				case 2:
+				{
+					count_2--;
+					if(count_2==0)
+						count_2=1;
+					fenjie(count_2);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+
+				case 3:
+				{
+					count_3--;
+					if(count_3==0)
+						count_3=1;
+					fenjie(count_3);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+		} 
+			while(k2==0);				
+			}  			
+		}
+			
+	}
+}
+void fenjie(uchar c)
+{
+	shi=c/10;
+	ge=c%10;
+}
+void delay(uchar z)
+{
+	uchar x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}  				

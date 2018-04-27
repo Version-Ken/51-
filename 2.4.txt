@@ -1,0 +1,22 @@
+#include<reg52.h>
+#include<intrins.h>
+#define uint unsigned int
+#define uchar unsigned char
+uchar a;
+void delay(uint z);
+void main()
+{
+	a=0xfe;
+	while(1)
+	{	
+		a=_crol_(a,1);
+		P0=a;
+		delay(500);
+	}
+}
+void delay(uint z)
+{	
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);	
+}

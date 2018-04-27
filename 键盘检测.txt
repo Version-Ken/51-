@@ -1,0 +1,98 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,f,count;
+sbit k1=P3^2;
+sbit k2=P3^3;
+sbit k3=P3^4;
+bit k1_last,k1_now;
+bit k2_last,k2_now;
+bit k3_last,k3_now;
+void out_put1();
+void out_put2();
+void delay(uint z);
+void init();
+void scan_key();
+void main()
+{
+	init();
+	while(1)
+	{
+		scan_key();
+		if(f==1)
+		{
+			out_put1();
+		}
+		if(f==3)
+		{
+			out_put2();		
+		}	
+	}		 
+}
+void delay(uint z)
+{
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}
+void init()
+{
+	a=0xfe;
+	P0=a;
+	f=0;
+	k1_last=1;
+	k1_now=1;
+	k2_last=1;
+	k2_now=1;
+	k3_last=1;
+	k3_now=1;	
+}
+void out_put1()
+{				
+	
+	delay(20);
+	count++;
+	if(count==10)
+	{	
+		a=_crol_(a,1);
+		P0=a;
+		count=0;	
+	}	
+}
+void out_put2()
+{
+	
+	delay(20);
+	count++;
+	if(count==10)
+	{
+		P0=a;
+		a=_cror_(a,1);
+		count=0;	
+	}	
+}
+void scan_key()
+{
+	k1_last=k1_now;
+	k1_now=k1;
+
+	k2_last=k2_now;
+	k2_now=k2;
+
+	k3_last=k3_now;
+	k3_now=k3;
+	 
+	if(k1_last==0&&k1_now==1)
+	{
+		f=1;
+	}
+	if(k2_last==0&&k2_now==1)
+	{
+		f=2;
+	}
+	if(k3_last==0&&k3_now==1)
+	{
+		f=3;
+	}						
+}

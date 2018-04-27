@@ -1,0 +1,71 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,c,f;
+sbit k3=P3^4;
+sbit k4=P3^5;
+bit k4_last,k4_now;
+bit k3_last,k3_now;
+void init();
+void scan_key();
+void main()
+{
+	init();
+	while(1)
+	{
+		scan_key();
+		if(f==1)
+		{
+			if(c==10)
+			{
+				P0=a;
+				a=_crol_(a,1);
+				c=0;
+			}
+		}
+			  		
+	}  
+}
+void init()
+{
+	TMOD=0x01;
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	TR0=1;
+	EA=1;
+	ET0=1;
+	a=0xfe;
+	P0=a;
+	c=0;
+	k4_last=1;
+	k4_now=1;
+	k3_last=1;
+	k3_now=1;
+	f=1;
+}
+void timer() interrupt 1
+{
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	c++;
+	if(c==11)
+		c=0; 	
+}
+void scan_key()
+{
+	k4_last=k4_now;
+	k4_now=k4;
+
+	k3_last=k3_now;
+	k3_now=k3;
+	 
+	if(k4_last==0&&k4_now==1)
+	{
+		f=1;
+	}
+	if(k3_last==0&&k3_now==1)
+	{
+		f=2;
+	}	
+}

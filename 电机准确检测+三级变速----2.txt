@@ -1,0 +1,179 @@
+#include<reg51.h>
+#include"1602lcd.h"        //lcd头文件
+#define uchar unsigned char
+#define uint unsigned int
+uchar bai,shi,ge,a,c,count1,s;    //定义所需字母
+uint count,f;
+sbit k5=P1^4;           //定义按键
+sbit k6=P1^5;
+sbit k7=P1^6;
+sbit k8=P1^7;
+bit k5_last=1,k5_now=1;   //定义按键初始状态
+bit k6_last=1,k6_now=1;
+bit k7_last=1,k7_now=1;
+bit k8_last=1,k8_now=1;
+sbit motor_a=P1^0;	
+sbit motor_b=P1^1;
+void set_timer0();
+void init();           //定义初始化函数
+void fenjie();         //定义分解函数
+void display();          //定义显示子函数
+void scan_key();           //定义键盘扫描子函数
+void main()          //主程序
+{
+	init();                 //初始化
+	while(1)               //大循环
+	{
+		count=TH0*256+TL0;
+		scan_key();	       //读按键
+		if(s==1)         //定义四个标志位，每个标志位对应一个电机状态
+		{
+			motor_a=0;
+			motor_b=1;	
+		}
+		if(s==2)
+		{
+			if(TF1==1)
+		    { 
+		    count1++;
+			if(count1>=100)	
+			count1=0;
+			{
+				if (count1<=90)      
+				{
+					 motor_a=0;
+					 motor_b=1;
+				}
+				 else
+				 {
+					 motor_a=1;
+					 motor_b=1;
+				 }
+			}
+		 	set_timer0();
+		 	TF1=0;
+		 	}	
+		}
+		if(s==3)
+		{				
+			if(TF1==1)
+		    { 
+		    count1++;
+			if (count1>=100)	
+			count1=0;
+			{
+				if (count1<=70)
+				 {
+					  motor_a=0;
+					  motor_b=1;
+				 }
+				 else
+				  {
+					  motor_a=1;
+					  motor_b=1;
+				  }
+			}
+		 	set_timer0();
+		 	TF1=0;
+		 	}		
+		}
+		if(s==4)
+		{
+			motor_a=1;
+			motor_b=1;	
+		}		
+		if(a==100)
+		{
+			f=f+count;
+			a=0;
+			TH0=0;
+			TL0=0;
+			c++;
+			if(c==3)       //计数三次，取平均值并*2
+			{
+				f=f/3*2;
+				fenjie();  //分解
+				lcd_init();    //初始化
+				display();     //将其显示
+				c=0;           //计数清零 
+				f=0;
+			}		
+		}
+			
+	}
+}
+void init()
+{
+	TMOD=0X15;         //对计数作初始状态定义
+	TH0=0;
+	TL0=0;
+	set_timer0();
+	TR0=0;
+	ET1=1;
+	EA=1;
+	lcd_init();
+	display();
+	c=0;
+	f=0;
+	a=0;
+}
+void fenjie()   //分解速度
+{
+	bai=f/100;
+	shi=f%100/10;
+	ge=f%10;
+}
+void display()      //LCD显示速度
+{
+	lcd_pos(1,7);
+	lcdwrite_sz(bai);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+}
+void scan_key()          //读按键程序
+{
+	k5_last=k5_now;
+	k5_now=k5;
+
+	k6_last=k6_now;
+	k6_now=k6;
+
+	k7_last=k7_now;
+	k7_now=k7;
+		
+	k8_last=k8_now;
+	k8_now=k8;
+	 
+	if(k5_last==0&&k5_now==1)
+	{
+		TR0=1;
+	}
+	if(k6_last==0&&k6_now==1)
+	{
+		TR0=0;
+	}
+	if(k7_last==0&&k7_now==1)
+	{
+		TR0=0;
+		TH0=0;
+		TL0=0;
+	}
+	
+	if(k8_last==0&&k8_now==1)
+	{
+		s++;
+		if(s==5)
+		s=1;
+	}
+}
+void timer() interrupt 3     //定时中断函数
+{
+	set_timer0();
+	a++;	
+}
+void set_timer0()
+{
+  TH1=(65536-5000)/256;
+  TL1=(65536-5000)%256;
+  TR1=1;
+}

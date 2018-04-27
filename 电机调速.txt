@@ -1,0 +1,95 @@
+#include<reg51.h>
+#define uchar unsigned char
+#define uint unsigned int
+sbit k8=P1^7;
+sbit motor_a=P1^0;	
+sbit motor_b=P1^1;
+uchar count1,s;
+bit k8_last=1,k8_now=1;
+void set_timer0();
+void scan_key();
+void main()
+{
+	TMOD=0X11;
+	set_timer0(); 
+	EA=1;	 	  
+	IT0=1;	  
+	EX0=1;	
+	while(1)
+	{
+		scan_key();
+		if(s==1)
+		{
+			motor_a=0;
+			motor_b=1;	
+		}
+		if(s==2)
+		{
+			if(TF0==1)
+		    { 
+		    count1++;
+			if (count1>=100)	
+			count1=0;
+			{
+				if (count1<=90)
+				 {
+					  motor_a=0;
+					  motor_b=1;
+				 }
+				 else
+				  {
+					  motor_a=1;
+					  motor_b=1;
+				  }
+			}
+		 	set_timer0();
+		 	TF0=0;
+		 	}	
+		}
+		if(s==3)
+		{
+					if(TF0==1)
+		    { 
+		    count1++;
+			if (count1>=100)	
+			count1=0;
+			{
+				if (count1<=70)
+				 {
+					  motor_a=0;
+					  motor_b=1;
+				 }
+				 else
+				  {
+					  motor_a=1;
+					  motor_b=1;
+				  }
+			}
+		 	set_timer0();
+		 	TF0=0;
+		 	}		
+		}
+		if(s==4)
+		{
+			motor_a=1;
+			motor_b=1;	
+		}	
+	}
+}
+void scan_key()
+{
+	k8_last=k8_now;
+	k8_now=k8;
+	if(k8_last==0&&k8_now==1)
+	{
+		s++;
+		if(s==5)
+		s=1;
+	}
+}
+void set_timer0()
+{
+  TH0=(65536-1500)/256;
+  TL0=(65536-1500)%256;
+  TR0=1;
+}

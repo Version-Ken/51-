@@ -1,0 +1,77 @@
+1.
+#include<reg52.h>
+#include<intrins.h>
+#define uchar unsigned char 
+#define uint unsigned int  
+uchar f;
+sbit k2=P3^3;
+sbit k3=P3^4;
+sbit k4=P3^5;
+sbit k5=P1^4;
+sbit k6=P1^5;
+sbit k7=P1^6;
+sbit k8=P1^7;
+void main()
+{
+	while(1)
+	{
+		if(k2==0)
+			P0=0xfe;
+		else if(k3==0)
+			P0=(0xfe<<1);
+		else if(k4==0)
+			P0=(0xfe<<2);
+		else if(k5==0)
+			P0=(0xfe<<3);
+		else if(k6==0)
+			P0=(0xfe<<4);
+		else if(k7==0)
+			P0=(0xfe<<5);
+		else if(k8==0)
+			P0=(0xfe<<6);
+		else
+			P0=0xff;
+	}
+}
+2.#include<reg52.h>
+#include<intrins.h>
+#define uchar unsigned char 
+#define uint unsigned int  
+uchar f;
+sbit k2=P3^3;
+sbit k3=P3^4;
+sbit k4=P3^5;
+sbit k5=P1^4;
+sbit k6=P1^5;
+sbit k7=P1^6;
+sbit k8=P1^7;
+#define k2_out 0xfe
+#define k3_out (0xfe<<1)
+#define k4_out (0xfe<<2)
+#define k5_out (0xfe<<3)
+#define k6_out (0xfe<<4)
+#define k7_out (0xfe<<5)
+#define k8_out (0xfe<<6)
+#define all_off (0xff)
+void main()
+{
+	while(1)
+	{
+		if(k2==0)
+			P0=k2_out;
+		else if(k3==0)
+			P0=k3_out;
+		else if(k4==0)
+			P0=k4_out;
+		else if(k5==0)
+			P0=k5_out;
+		else if(k6==0)
+			P0=k6_out;
+		else if(k7==0)
+			P0=k7_out;
+		else if(k8==0)
+			P0=k8_out;
+		else
+			P0=all_off;
+	}
+}

@@ -1,0 +1,289 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char 
+#define uint unsigned int
+uchar key,key1,key2,ge,shi,num;
+void scan_key();
+void display();
+void main()
+{
+	lcd_init();
+	while(1)
+	{
+		scan_key();
+		display();	
+	}
+}
+void scan_key()
+{
+	P1=0xf0;
+	key1=P1;
+
+	P1=0x0f;
+	key2=P1;
+
+	key=key1+key2;
+	switch(key)
+	{
+		case 0xee:num=1;break;
+		case 0xde:num=2;break;
+		case 0xbe:num=3;break;
+		case 0x7e:num=4;break;
+		case 0xed:num=5;break;
+		case 0xdd:num=6;break;
+		case 0xbd:num=7;break;
+		case 0x7d:num=8;break;
+		case 0xeb:num=9;break;
+		case 0xdb:num=10;break;
+		case 0xbb:num=11;break;
+		case 0x7b:num=12;break;
+		case 0xe7:num=13;break;
+		case 0xd7:num=14;break;
+		case 0xb7:num=15;break;
+		case 0x77:num=16;break;
+	}
+}
+void display()
+{
+	ge=num%10;
+	shi=num/10;
+	lcd_pos(1,8);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);	
+}
+
+
+
+
+
+视频方法
+
+
+
+
+#include<reg51.h> 
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar num;
+uchar scan_key();
+void display();
+void main()
+{
+	TMOD=0X01;
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	EA=1;
+	ET0=1;
+	TR0=1;
+	lcd_init();
+	while(1)
+	{
+		
+	}
+}
+void timer() interrupt 1
+{
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	scan_key();
+	display();		
+}
+uchar scan_key()
+{
+	uchar key,key1,key2;
+	P1=0xf0;
+	key1=P1;
+
+	P1=0x0f;
+	key2=P1;
+
+	key=key1+key2;
+	switch(key)
+	{
+		case 0xee:num=1;break;
+		case 0xde:num=2;break;
+		case 0xbe:num=3;break;
+		case 0x7e:num=4;break;
+		case 0xed:num=5;break;
+		case 0xdd:num=6;break;
+		case 0xbd:num=7;break;
+		case 0x7d:num=8;break;
+		case 0xeb:num=9;break;
+		case 0xdb:num=10;break;
+		case 0xbb:num=11;break;
+		case 0x7b:num=12;break;
+		case 0xe7:num=13;break;
+		case 0xd7:num=14;break;
+		case 0xb7:num=15;break;
+		case 0x77:num=16;break;
+		default: key=0xff;
+	}
+	return  num;
+}
+void display()
+{
+	lcd_pos(1,1);
+	lcdwrite_zm('P');
+	lcdwrite_zm('U');
+	lcdwrite_zm('S');
+	lcdwrite_zm('H');
+	lcdwrite_zm(' ');
+	lcdwrite_zm('K');
+	lcdwrite_zm('E');
+	lcdwrite_zm('Y');
+	lcdwrite_zm(':');
+	lcd_pos(2,8);
+	lcdwrite_zm('K');
+	lcdwrite_sz(num/10);
+	lcdwrite_sz(num%10);
+}
+
+
+
+
+
+
+
+
+或
+
+
+
+
+
+
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char 
+#define uint unsigned int
+uchar temp,ge,shi,num;
+void scan_key();
+void delay(uint z);
+void display();
+void main()
+{
+	lcd_init();
+	while(1)
+	{
+		scan_key();
+		display();	
+	}
+}
+void delay(uint z)
+{
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}
+void scan_key()
+{
+	P1=0xfe;
+	temp=P1;
+	temp=temp&0xf0;
+	if(temp!=0xf0)
+	{
+		delay(5);
+		temp=P1;
+		temp=temp&0xf0;
+		if(temp!=0xf0)
+		{
+			temp=P1;
+			switch(temp)
+			{
+				case 0xee:num=1;break;
+				case 0xde:num=2;break;
+				case 0xbe:num=3;break;
+				case 0x7e:num=4;break;
+			}
+			while(temp!=0xf0)
+			{
+				temp=P1;
+				temp=temp&0xf0;
+			}
+		}
+	}
+	P1=0xfd;
+	temp=P1;
+	temp=temp&0xf0;
+	if(temp!=0xf0)
+	{
+		delay(5);
+		temp=P1;
+		temp=temp&0xf0;
+		if(temp!=0xf0)
+		{
+			temp=P1;
+			switch(temp)
+			{
+				case 0xed:num=5;break;
+				case 0xdd:num=6;break;
+				case 0xbd:num=7;break;
+				case 0x7d:num=8;break;
+			}
+			while(temp!=0xf0)
+			{
+				temp=P1;
+				temp=temp&0xf0;
+			}
+		}
+	}
+	P1=0xfb;
+	temp=P1;
+	temp=temp&0xf0;
+	if(temp!=0xf0)
+	{
+		delay(5);
+		temp=P1;
+		temp=temp&0xf0;
+		if(temp!=0xf0)
+		{
+			temp=P1;
+			switch(temp)
+			{
+				case 0xeb:num=9;break;
+				case 0xdb:num=10;break;
+				case 0xbb:num=11;break;
+				case 0x7b:num=12;break;
+			}
+			while(temp!=0xf0)
+			{
+				temp=P1;
+				temp=temp&0xf0;
+			}
+		}
+	}
+	P1=0xf7;
+	temp=P1;
+	temp=temp&0xf0;
+	if(temp!=0xf0)
+	{
+		delay(5);
+		temp=P1;
+		temp=temp&0xf0;
+		if(temp!=0xf0)
+		{
+			temp=P1;
+			switch(temp)
+			{
+				case 0xe7:num=13;break;
+				case 0xd7:num=14;break;
+				case 0xb7:num=15;break;
+				case 0x77:num=16;break;
+			}
+			while(temp!=0xf0)
+			{
+				temp=P1;
+				temp=temp&0xf0;
+			}
+		}
+	}
+}
+void display()
+{
+	ge=num%10;
+	shi=num/10;
+	lcd_pos(1,8);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);	
+}

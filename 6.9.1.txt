@@ -1,0 +1,68 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar count,ge,shi,bai,flag;
+sbit k1=P1^4;
+sbit k2=P1^5;
+sbit k3=P1^6;
+void fenjie();
+void scan_key();
+void main()
+{
+	lcd_init();
+	lcd_pos(1,1);
+	lcdwrite_zm('c');
+	lcdwrite_zm('o');
+	lcdwrite_zm('u');
+	lcdwrite_zm('n');
+	lcdwrite_zm('t');
+	lcdwrite_zm(':');
+
+	lcd_pos(2,8);
+	lcdwrite_sz(bai);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+	IT1=1;
+	EA=1;
+	EX1=1;
+	while(1)
+	{
+		scan_key();
+		fenjie();
+		lcd_pos(2,8);
+		lcdwrite_sz(bai);
+		lcdwrite_sz(shi);
+		lcdwrite_sz(ge);			
+	}
+}
+void fenjie()
+{
+	bai=count/100;
+	shi=count%100/10;
+	ge=count%10;
+}
+void timer0() interrupt 2
+{
+	if(flag==0)
+	{
+		count++;
+		if(count==10)
+			count=0;
+	}	
+}
+void scan_key()
+{
+	k1=1;
+	k2=1;
+	k3=1;
+	if(k1==0)
+		flag=0;
+	if(k2==0)
+		flag=1;
+	if(k3==0)
+		{
+			flag=2;
+			count=0;
+		}	
+}

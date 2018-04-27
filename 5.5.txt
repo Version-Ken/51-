@@ -1,0 +1,81 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar table1[]=("count_1:");
+uchar table2[]=("count_2:");
+uchar table3[]=("count_3:");
+sbit k1=P3^2;
+sbit k2=P3^3;
+sbit k3=P3^4;
+uchar f=1,shi,ge,count;
+void fenjie(uchar count);
+void delay(uchar z);
+void main()
+{
+	lcd_init();
+	while(1)
+	{	
+		if(k1==0)
+		{
+			delay(20);
+			if(k1==0)
+			{
+				f++;
+				while(k1==0);
+				if(f==4)
+					f=1; 				
+			}  			
+		}
+		
+		switch(f)
+		{
+			case 1:
+				{
+					lcd_pos(1,1);
+					lcdwrite_string(table1);
+					count=17;
+					fenjie(count);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+
+				case 2:
+				{
+					lcd_pos(1,1);
+					lcdwrite_string(table2);
+					count=28;
+					fenjie(count);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+
+				case 3:
+				{
+					lcd_pos(1,1);
+					lcdwrite_string(table3);
+					count=39;
+					fenjie(count);
+					lcd_pos(2,6);
+					lcdwrite_sz(shi);
+					lcdwrite_sz(ge);
+				}
+				break;
+		}	
+	}
+}
+void fenjie(uchar count)
+{
+	shi=count/10;
+	ge=count%10;
+}
+void delay(uchar z)
+{
+	uchar x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}  				

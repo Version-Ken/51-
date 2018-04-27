@@ -1,0 +1,56 @@
+#include<reg52.h>
+#include<intrins.h>
+#define uchar unsigned char 
+#define uint unsigned int  
+uchar a;
+bit flag=0;
+uint count;
+sbit k1=P3^2;
+void delay(uint z);
+void out_put();
+void key_scan();
+void main()
+{
+	a=0xfe;
+	while(1)
+	{
+		key_scan();	
+		out_put();
+
+	}
+}
+void delay(uint z)
+{
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}
+void key_scan()
+{
+	k1=1;
+	if(k1==0)
+	{
+		delay(20);
+		if(k1==0)
+		{
+			while(k1==0);
+			flag=~flag;
+		}
+	}
+
+}
+void out_put()
+{
+	if(flag==0)
+	{
+	
+		delay(20);
+		count++;
+		if(count==20)
+		{
+			a=_crol_(a,1);
+			P0=a;
+			count=0;	
+		}	
+	}
+}

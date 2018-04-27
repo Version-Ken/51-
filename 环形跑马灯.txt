@@ -1,0 +1,130 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uint a,b,c1,c2,f,count,speed;
+sbit k1=P3^2;
+sbit k2=P3^3;
+sbit k3=P3^4;
+sbit k4=P3^5; 
+void delay1(uint z1);
+void delay2(uint z2);
+void scan_key();
+void out_put1();
+void out_put2();
+void init();
+void main()
+{		
+ 	init();
+	while(1)
+	{	
+		scan_key();	
+		if(f!=0)
+		{
+			if(f==1)
+				out_put1();
+			if(f==2)
+				out_put2();
+		}	 	
+	}	
+}
+void delay1(uint z1)
+{
+	uint x1,y1;
+	for(x1=z1;x1>0;x1--)
+		for(y1=110;y1>0;y1--);
+}
+void delay2(uint z2)
+{
+	uint x2,y2;
+	for(x2=z2;x2>0;x2--)
+		for(y2=110;y2>0;y2--);
+}
+void init()
+{
+	a=0xfffe;
+  	b=0x7fff;
+	f=1;
+	speed=10;  
+}
+void out_put1()
+{
+	for(c1=9;c1>0;c1--)
+		{
+		   
+			delay1(1);
+			count++;
+			if(count==30*speed)
+			{	 	 
+				a=_irol_(a,1);
+				b=_iror_(b,1);
+				P0=b;
+				P1=a;
+				count=0;
+			}
+		}	
+}
+void out_put2()
+{
+	for(c1=9;c1>0;c1--)
+		{
+		   
+			delay1(1);
+			count++;
+			if(count==30*speed)
+			{	 
+				P1=a;
+				P0=b;
+				a=_iror_(a,1);
+				b=_irol_(b,1);
+				count=0;
+			}
+		}		
+}
+void scan_key()
+{
+	if(k1==0)
+	{
+		delay2(20);
+		if(k1==0)
+			{
+				f=1;
+				while(k1==0);
+			}
+	}
+	if(k2==0)
+	{
+		delay2(20);
+		if(k2==0)
+		{
+			f=2;
+			while(k2==0);
+		}			
+	}
+	if(k4==0)
+	{
+		delay2(20);
+		if(k4==0)
+		{
+			speed++;
+			if(speed>20)
+				speed=20;
+			if(k3==0)
+				f=0;	
+			while(k4==0);
+		}
+	}
+	if(k3==0)
+	{
+		delay2(20);
+		if(k3==0)
+		{
+			speed--;	
+			if(speed<1)
+				speed=1;
+			if(k4==0)
+				f=0; 
+			 while(k3==0);
+		}
+	}
+}

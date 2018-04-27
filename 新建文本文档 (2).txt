@@ -1,0 +1,165 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+#define time 1000
+sbit k6=P1^5;
+sbit k5=P1^4;
+sbit k7=P1^6;
+sbit k8=P1^7;
+sbit k4=P3^5;
+sbit Led0=P1^0;
+bit k5_last=1,k5_now=1,k6_last=1,k6_now=1,k7_last=1,k7_now=1,k8_last=1,k8_now=1,k4_last=1,k4_now=1;
+bit time_ok_flag;
+void scan_key();
+void scan_timer();
+void set_timer();
+uchar count_k6=0;
+uchar time_set_ok;
+uint c=0;
+uchar count=0,second=0;
+bit system_flag;
+void main()					   //主程序
+{
+   lcd_init();
+   lcd_pos(1,0);          
+	lcdwrite_zm('S');
+	lcdwrite_zm('t');
+	lcdwrite_zm('o');
+	lcdwrite_zm('p');				   //显示屏初始化
+   TMOD=0X11;				   //设置定时器的工作方式
+   set_timer();
+ while(1)
+ {  
+  scan_key();
+  scan_timer();
+  if(time_ok_flag==1)
+  Led0=0;				   //time_ok_flag==1时灯亮
+ }	 
+}
+void set_timer()
+{
+    TH0=(65536-50000)/256;
+    TL0=(65536-50000)%256;	   //装入初始值
+    TR0=1;					   //接通T0计数
+}
+void ex_into() interrupt 1	   //开启中断
+{							   
+  set_timer();				   //设置初始值
+  c++;
+}
+void scan_key()
+{
+ k5_last=k5_now;
+ k5_now=k5;
+ k6_last=k6_now;
+ k6_now=k6;
+ k7_last=k7_now;
+ k7_now=k7;
+ k8_last=k8_now;
+ k8_now=k8;
+ k4_last=k4_now;
+ k4_now=k4;
+ if(k5_last==0&&k5_now==1)
+ {
+  system_flag=0; 
+  TR0=0;
+  count_k6=0;
+  lcd_init();
+  lcd_pos(1,0);          
+ lcdwrite_zm('S');
+ lcdwrite_zm('t');
+ lcdwrite_zm('a');
+ lcdwrite_zm('r');
+ lcdwrite_zm('t');
+ 							   //按下K5，system_flag=0，计时器关闭，屏幕显示对应内容
+ }
+ if(k6_last==0&&k6_now==1&&system_flag==0)
+ {
+ count_k6++;
+ lcd_clear();
+ lcd_pos(1,0);          
+ lcdwrite_zm('S');
+ lcdwrite_zm('e');
+ lcdwrite_zm('t');
+  lcd_pos(1,5);
+ lcdwrite_zm('t');
+ lcdwrite_zm('i');
+ lcdwrite_zm('m');
+ lcdwrite_zm('e');
+ lcd_pos(2,1);         
+ lcdwrite_sz(count_k6/10);	   //按下K6，
+ lcdwrite_sz(count_k6%10);
+ }
+ if(k7_last==0&&k7_now==1&&system_flag==0)
+ {
+  time_set_ok=count_k6;
+  lcd_clear();
+ lcd_pos(1,0);          
+ lcdwrite_zm('R');
+ lcdwrite_zm('e');
+ lcdwrite_zm('a');
+ lcdwrite_zm('d');
+ lcdwrite_zm('y');
+ lcd_pos(2,1);         
+ lcdwrite_sz(count_k6/10);
+ lcdwrite_sz(count_k6%10);
+ }
+ if(k8_last==0&&k8_now==1)
+ {
+  system_flag=1;
+  set_timer();
+   lcd_clear();
+ lcd_pos(1,0);          
+ lcdwrite_zm('G');
+ lcdwrite_zm('o');
+ lcd_pos(2,1);         
+ lcdwrite_sz(count_k6/10);
+ lcdwrite_sz(count_k6%10);
+ }
+if(k4_last==0&&k4_now==1)			  //K4键，就是取消当前的状态，相当于复位键，这样子就又可以重新开始工作了
+{
+	lcd_init();
+	lcd_pos(1,0);          
+	lcdwrite_zm('S');
+	lcdwrite_zm('t');
+	lcdwrite_zm('o');
+	lcdwrite_zm('p');
+	time_ok_flag=0;
+	Led0=1;
+	count_k6=0;
+	c=0;
+	time_set_ok=0;
+	system_flag=0;
+	count=0;
+	second=0;
+	system_flag=0;
+}
+}
+void scan_timer()
+{
+ if(system_flag==1)
+ {
+  if(TF0==1)
+  {
+   count++;
+   if(count==10)
+   {
+   	second++;
+	count=0;
+	if(second==time_set_ok)
+	{
+	 time_ok_flag=1;
+	}
+	else
+	 time_ok_flag=0;
+   }
+   if(time_ok_flag==0)
+   {
+   	set_timer();
+	TF0=0;
+   }
+  }
+ }
+}

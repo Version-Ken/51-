@@ -1,0 +1,85 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar shi,fen,miao,shifen,gefen,shimiao,gemiao,shishi,geshi,a;
+void init();
+void display();
+void fenjie();
+void main()
+{
+	init();
+	lcd_init();
+	while(1)
+	{
+		if(a==20)
+		{
+			miao++;
+			a=0;
+			if(miao==60)
+			{
+				fen++;
+				miao=0;
+				if(fen==60)
+				{
+					shi++;
+					fen=0;
+				}
+			}
+			fenjie();
+			display();
+		}	 	  		
+	}  
+}
+void init()
+{
+	TMOD=0x11;
+	TH0=(65536-500)/256;
+	TL0=(65536-500)%256;
+	TR0=1;
+	EA=1;
+	ET0=1;
+	a=0;
+	shi=0;
+	fen=0;
+	miao=0;
+	lcd_pos(1,5);
+	lcdwrite_sz(0);
+	lcdwrite_sz(0);
+	lcdwrite_zm('-');
+	lcdwrite_sz(0);
+	lcdwrite_sz(0);
+	lcdwrite_zm('-');
+	lcdwrite_sz(0);
+	lcdwrite_sz(0);
+}
+void timer() interrupt 1
+{
+	TH0=(65536-500)/256;
+	TL0=(65536-500)%256; 
+	a++;		
+}
+void display()
+{
+	lcd_pos(1,5);
+	lcdwrite_sz(shishi);
+	lcdwrite_sz(geshi);
+	lcdwrite_zm('-');
+	lcdwrite_sz(shifen);
+	lcdwrite_sz(gefen);
+	lcdwrite_zm('-');
+	lcdwrite_sz(shimiao);
+	lcdwrite_sz(gemiao);
+}
+void fenjie()
+{
+	geshi=shi%10;
+	shishi=shi/10;
+
+	shifen=fen/10;
+	gefen=fen%10;
+
+	shimiao=miao/10;
+	gemiao=miao%10;
+		
+}								

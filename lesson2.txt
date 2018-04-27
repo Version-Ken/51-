@@ -1,0 +1,39 @@
+#include<reg52.h>
+#include<intrins.h>
+#define uint unsigned int
+#define uchar unsigned char
+uint a,b,c;
+void delay(uint z);
+void main()
+{
+	a=0x0fff;	
+	b=0xf0ff;  
+	while(1)
+	{	
+		a=_irol_(a,1);
+		b=_irol_(b,1);
+		P0=b;
+		P1=a;
+		delay(300);
+		if(a==0xff0f)
+		{
+			a=_irol_(a,0);
+			b=_irol_(b,0);
+			P1=~P1;
+			P0=~P0;
+			delay(300);
+			P1=~P1;
+			P0=~P0;
+			delay(300);
+			P1=~P1;
+			P0=~P0;
+			delay(300);		
+		}
+	}
+}
+void delay(uint z)
+{	
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);	
+}

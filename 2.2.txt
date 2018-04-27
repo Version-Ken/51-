@@ -1,0 +1,9 @@
+#include<reg52.h>
+sbit d1=P0^1;
+void main()
+{
+	while(1)
+	{
+	 	d1=0;;
+	}
+}

@@ -1,0 +1,89 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,count,f;
+void timer();
+void init();
+void main()
+{
+	init();
+	while(1)
+	{
+		if(TF0==1)
+		{
+			count++;
+			if(count==20)
+			{
+				f=1;
+				count=0;			
+			} 
+			timer();
+			TF0=0;
+		}
+		if(f==1)
+		{
+			P0=a;
+			a=_crol_(a,1);
+			f=0;
+		} 	  
+		
+	}  
+}
+void init()
+{
+	TMOD=0x11;
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	TR0=1;
+	a=0xfe;
+	count=0; 
+}
+void timer()
+{
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	TR0=1; 	
+}
+
+
+
+
+
+我的方法
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,c,f;
+void init();
+void main()
+{
+	init();
+	while(1)
+	{
+		if(c==20)
+		{
+			P0=a;
+			a=_crol_(a,1);
+			c=0;
+		} 	  		
+	}  
+}
+void init()
+{
+	TMOD=0x01;
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	TR0=1;
+	EA=1;
+	ET0=1;
+	a=0xfe;
+	c=0; 
+}
+void timer() interrupt 1
+{
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	c++; 	
+}																		

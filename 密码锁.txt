@@ -1,0 +1,99 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,f,count;
+sbit k1=P3^2;
+sbit k2=P3^3;
+sbit k3=P3^4;
+sbit k4=P3^5;
+void out_put();
+void delay(uint z);
+void init();
+void scan_key();
+void main()
+{
+	init();
+	while(1)
+	{
+		scan_key();
+		if(f==5)
+		{
+			out_put();
+		}	
+	}
+}
+void delay(uint z)
+{
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}
+void init()
+{
+	a=0xfe;
+	f=0;	
+}
+void out_put()
+{
+	
+	delay(20);
+	count++;
+	if(count==10)
+	{
+		P0=a;
+		a=_crol_(a,1);
+		count=0;	
+	}	
+}
+void scan_key()
+{
+	if(k1==0)
+	{
+		delay(20);
+		if(k1==0)
+		{
+			if(f!=3)
+		 		f=1;
+			if(f==3)
+				f=4;
+			while(k1==0);
+		}
+	}
+	if(k2==0)
+	{
+		delay(20);
+		if(k2==0)
+		{
+			if(f==1)
+				f=2;
+			else 
+				f=0;
+			while(k2==0);
+		}
+	}
+	if(k3==0)
+	{
+		delay(20);
+		if(k3==0)
+		{
+			if(f==2)
+				f=3;
+			else if(f==4)
+				f=5;
+			else
+				f=0;
+			while(k3==0);
+		}
+	}
+	if(k4==0)
+	{
+		delay(20);
+		if(k4==0)
+		{
+			if(f==5)
+				f=6;
+			while(k4==0);
+		}
+	}			
+}

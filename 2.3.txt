@@ -1,0 +1,16 @@
+#include<reg52.h>
+#define uint unsigned int
+uint x,y;
+sbit d1=P0^1;
+void main()
+{
+	while(1)
+	{
+	 	d1=0;
+		for(x=500;x>0;x--)
+				for(y=110;y>0;y--);
+		d1=1;
+		for(x=500;x>0;x--)
+			for(y=110;y>0;y--);
+	}
+}

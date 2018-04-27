@@ -1,0 +1,18 @@
+#include<reg52.h>
+#define uint unsigned int
+uint x,y;
+sbit d1=P0^1;
+void delay(uint z);
+void main()
+{
+	while(1)
+	{
+	 	d1=~d1;
+		delay(500);
+	}
+}
+void delay(uint z)
+{
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);	
+}

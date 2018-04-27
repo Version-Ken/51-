@@ -1,0 +1,241 @@
+#include<reg51.h>
+#include"1602lcd.h"	   //lcd头文件
+#define uchar unsigned char	 //两个宏定义
+#define uint unsigned int
+sbit k5=P1^4;	  //定义按键k5正转，k6反转，k7暂停
+sbit k6=P1^5;
+sbit k7=P1^6;
+bit k5_last=1,k5_now=1;	 //定义按键初始状态
+bit k6_last=1,k6_now=1;
+bit k7_last=1,k7_now=1;
+sbit motor_a=P1^0;	//电机端口定义
+sbit motor_b=P1^1;
+uchar f; 		   //标志位定义
+void display1();	//定义显示子函数
+void display2();
+void display3();
+void display4();
+void display5();
+void scan_key();	//定义键盘扫描子函数
+void init();		//定义初始化函数
+void main()			//主函数
+{  
+	lcd_init();		//先进性1062lcd显示初始化
+	init();
+	display5();		//初始化各个值和开启中断
+    while(1)		//大循环
+  {
+  	scan_key();		 //键盘扫描函数
+  	if(f==1)		 //判断f是否为1，如果为1则显示 display1()子函数
+		display1();	 
+	else if(f==2)	  //判断f是否为2，如果为1则显示 display2()子函数 
+		display2();	  
+	else if(f==3)	  //判断f是否为3，如果为1则显示 display5()子函数
+		display5();	   
+	else if(f==4)	  //判断f是否为4，如果为1则显示 display3()子函数
+		display3();
+	else if(f==5)	   //判断f是否为5，如果为1则显示 display4()子函数 
+		display4();
+  }	 
+  
+}
+void init()
+{	 
+	EA=1;	  //中断允许总开关开启
+	IT1=1;	  //选择中断1为下降沿触发方式
+	EX1=1;	  //允许外部中断1
+	IT0=1;	  //选择中断0为下降沿触发方式
+	EX0=1;	  //允许外部中断0
+}
+void display1()			 //显示子函数1
+{
+  	lcd_pos(1,1);		 //lcd位置为第1行第1个位置
+    lcdwrite_zm('S');	  //显示字母S （下，同理）
+    lcdwrite_zm('T');
+    lcdwrite_zm('A');
+    lcdwrite_zm('T');
+    lcdwrite_zm('E');
+	lcdwrite_zm(':');
+	lcd_pos(1,8);		  //lcd位置为第1行第8个位置
+	lcdwrite_zm('L');
+	lcdwrite_zm('E');
+	lcdwrite_zm('F');
+	lcdwrite_zm('T');
+	lcd_pos(2,1);		  //lcd位置为第2行第1个位置
+    lcdwrite_zm('L');
+    lcdwrite_zm('I');
+    lcdwrite_zm('M');
+    lcdwrite_zm('I');
+    lcdwrite_zm('T');
+	lcdwrite_zm(':');
+	lcd_pos(2,8);		 //lcd位置为第2行第8个位置
+	lcdwrite_zm('O');
+	lcdwrite_zm('K');
+	motor_a=0;			  //直流电机正转
+	motor_b=1;
+} 
+void display2()
+{
+	lcd_pos(1,1);
+    lcdwrite_zm('S');
+    lcdwrite_zm('T');
+    lcdwrite_zm('A');
+    lcdwrite_zm('T');
+    lcdwrite_zm('E');
+	lcdwrite_zm(':');
+	lcd_pos(1,8);
+	lcdwrite_zm('R');
+	lcdwrite_zm('I');
+	lcdwrite_zm('G');
+	lcdwrite_zm('H');
+	lcdwrite_zm('T');
+	lcd_pos(2,1);
+    lcdwrite_zm('L');
+    lcdwrite_zm('I');
+    lcdwrite_zm('M');
+    lcdwrite_zm('I');
+    lcdwrite_zm('T');
+	lcdwrite_zm(':');
+	lcd_pos(2,8);
+	lcdwrite_zm('O');
+	lcdwrite_zm('K');
+	motor_a=1;				 //直流电机反转
+	motor_b=0;  
+}
+void display3()
+{
+	lcd_pos(1,1);
+    lcdwrite_zm('S');
+    lcdwrite_zm('T');
+    lcdwrite_zm('A');
+    lcdwrite_zm('T');
+    lcdwrite_zm('E');
+	lcdwrite_zm(':');
+	lcd_pos(1,8);
+	lcdwrite_zm('S');
+	lcdwrite_zm('T');
+	lcdwrite_zm('O');
+	lcdwrite_zm('P');
+	lcd_pos(2,1);
+    lcdwrite_zm('L');
+    lcdwrite_zm('I');
+    lcdwrite_zm('M');
+    lcdwrite_zm('I');
+    lcdwrite_zm('T');
+	lcdwrite_zm(':');
+	lcd_pos(2,8);
+	lcdwrite_zm('L');
+	lcdwrite_zm('I');
+	lcdwrite_zm('F');
+	lcdwrite_zm('T'); 
+	motor_a=1;				 //直流电机停止
+	motor_b=1;
+}
+void display4()
+{
+	lcd_pos(1,1);
+    lcdwrite_zm('S');
+    lcdwrite_zm('T');
+    lcdwrite_zm('A');
+    lcdwrite_zm('T');
+    lcdwrite_zm('E');
+	lcdwrite_zm(':');
+	lcd_pos(1,8);
+	lcdwrite_zm('S');
+	lcdwrite_zm('T');
+	lcdwrite_zm('O');
+	lcdwrite_zm('P');
+	lcd_pos(2,1);
+    lcdwrite_zm('L');
+    lcdwrite_zm('I');
+    lcdwrite_zm('M');
+    lcdwrite_zm('I');
+    lcdwrite_zm('T');
+	lcdwrite_zm(':');
+	lcd_pos(2,8);
+	lcdwrite_zm('R');
+	lcdwrite_zm('I');
+	lcdwrite_zm('G');
+	lcdwrite_zm('H');
+	lcdwrite_zm('T');
+	motor_a=1;			  	 //直流电机停止
+	motor_b=1;
+}
+void display5()
+{
+	lcd_pos(1,1);
+    lcdwrite_zm('S');
+    lcdwrite_zm('T');
+    lcdwrite_zm('A');
+    lcdwrite_zm('T');
+    lcdwrite_zm('E');
+	lcdwrite_zm(':');
+	lcd_pos(1,8);
+	lcdwrite_zm('S');
+	lcdwrite_zm('T');
+	lcdwrite_zm('O');
+	lcdwrite_zm('P');
+	lcd_pos(2,1);
+    lcdwrite_zm('L');
+    lcdwrite_zm('I');
+    lcdwrite_zm('M');
+    lcdwrite_zm('I');
+    lcdwrite_zm('T');
+	lcdwrite_zm(':');
+	lcd_pos(2,8);
+	lcdwrite_zm('O');
+	lcdwrite_zm('K');
+	motor_a=1;					 //直流电机停止
+	motor_b=1;
+}
+void scan_key()					 //键盘扫描子函数
+{
+	k5_last=k5_now;				   //给按键赋值
+	k5_now=k5;
+
+	k6_last=k6_now;
+	k6_now=k6;
+
+	k7_last=k7_now;
+	k7_now=k7;
+	 
+	if(k5_last==0&&k5_now==1)	  //判断是否为按键k5抬起来的时候
+	{
+		if(f!=4)				   //判断现在的标志位是否为4(正转限位)，若不是则进入大括号里面
+		{  
+			f=1;					//把标志位置为1
+			lcd_init();			   //初始化显示程序
+		}			
+	}
+	if(k6_last==0&&k6_now==1)	   //判断是否为按键k6抬起来的时候
+	{
+		if(f!=5)				   //判断现在的标志位是否为4(反转限位)，若不是则进入大括号里面
+		{
+			f=2;					  //把标志位置为2
+			lcd_init();				    //初始化显示程序
+		}
+		
+	}
+	if(k7_last==0&&k7_now==1)	   //判断是否为按键k7抬起来的时候
+	{
+		if(f==1||f==2)			   //判断现在的标志位是否为1或2(正转或反转)，若是则进入大括号里面
+		{						
+			f=3;					 	//把标志位置为3
+			lcd_init();				 //初始化显示程序
+		}							 
+	}						
+}
+void timer0() interrupt 0			//外部中断0的中断服务函数
+{	 
+	if(f==1)						 //判断f是否为1
+	{		
+		f=4;						  //把标志位置为4
+	}	
+}
+void timer1() interrupt 2		 	//外部中断1的中断服务函数
+{	
+	if(f==2)						 //判断f是否为2
+	{			
+		f=5;
+	}								   //把标志位置为5
+}																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																															

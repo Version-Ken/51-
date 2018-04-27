@@ -1,0 +1,45 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,a1,c,c1;
+void init();
+void main()
+{
+	init();
+	while(1)
+	{
+		if(c==20)
+		{
+			P0=a;
+			a=_crol_(a,1);
+			c=0;
+		}
+		if(c1==10)
+		{
+			P1=a1;
+			a1=_crol_(a1,1);
+			c1=0;
+		} 	  		
+	}  
+}
+void init()
+{
+	TMOD=0x01;
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	TR0=1;
+	EA=1;
+	ET0=1;
+	a=0xfe;
+	a1=0xfe;
+	c=0; 
+	c1=0;
+}
+void timer() interrupt 1
+{
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	c++; 
+	c1++;	
+}									

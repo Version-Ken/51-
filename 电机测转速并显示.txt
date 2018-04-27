@@ -1,0 +1,107 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uint count;
+uchar bai,shi,ge,a;
+sbit b=P3^6;
+sbit k6=P1^5;
+sbit k7=P1^6;
+sbit k8=P1^7;
+bit k6_last=1,k6_now=1;
+bit k7_last=1,k7_now=1;
+bit k8_last=1,k8_now=1;
+void init();
+void display();
+void scan_key();
+void main()
+{
+	init();
+	while(1)
+	{
+		scan_key();
+		count=TH0*256+TL0;
+		bai=count/100;
+			shi=count%100/10;
+			ge=count%10;		
+		if(a==20)
+		{
+			lcd_init();			
+			display();
+		
+			a=0;
+			TH0=0;
+		    TL0=0;							
+		}
+	}	
+}
+void init()
+{
+	TMOD=0X15;
+	TH0=0;
+	TL0=0;
+	TH1=(65536-50000)/256;
+	TL1=(65536-50000)%256;
+	TR0=0;
+	TR1=1;
+	EA=1;
+	ET1=1;
+	lcd_init();
+	lcd_pos(1,5);
+	lcdwrite_zm('C');
+	lcdwrite_zm('O');
+	lcdwrite_zm('U');
+	lcdwrite_zm('N');
+	lcdwrite_zm('T');
+	lcdwrite_zm(':');
+	lcdwrite_sz(bai);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+}
+void display()
+{
+	lcd_pos(1,5);
+	lcdwrite_zm('C');
+	lcdwrite_zm('O');
+	lcdwrite_zm('U');
+	lcdwrite_zm('N');
+	lcdwrite_zm('T');
+	lcdwrite_zm(':');
+	lcdwrite_sz(bai);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);		
+}
+void scan_key()
+{
+	k6_last=k6_now;
+	k6_now=k6;
+
+	k7_last=k7_now;
+	k7_now=k7;
+
+	k8_last=k8_now;
+	k8_now=k8;
+	
+	if(k7_last==0&&k7_now==1)
+	{
+		TR0=1;
+		
+	}
+	if(k8_last==0&&k8_now==1)
+	{
+		lcd_init();
+		TH0=0;
+		TL0=0;
+		TR0=0;	
+	}
+		if(k6_last==0&&k6_now==1)
+	{
+		TR0=0;		
+	}	
+}
+void timer() interrupt 3
+{
+	TH1=(65536-50000)/256;
+	TL1=(65536-50000)%256;
+	a++;		
+}

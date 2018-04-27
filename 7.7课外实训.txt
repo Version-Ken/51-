@@ -1,0 +1,86 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,a1,b,b1,c,c1;
+sbit k3=P3^4;
+sbit k4=P3^5;
+bit f,f1,f2,f4,k3_last=1,k3_know=1,k4_last=1,k4_know=1;  
+void main()
+{
+	TMOD=0X11;
+	TH0=(65535-50000)/256;
+	TL0=(65535-50000)%256;
+	TR0=1;
+	EA=1;
+	ET0=1;
+	c=0xfe;
+	P1=c;
+	c1=0xfe;
+	P0=c1;
+	while(1)
+	{
+		if(f==1&&f1==1)	
+		{
+			c1=_crol_(c1,1);
+			P0=c1;
+			f1=0;			
+		}
+		if(f2==1&&f4==1)	
+		{
+			c=_crol_(c,1);
+			P1=c;
+			f4=0;			
+		}			
+	}
+}
+void timer0() interrupt 1
+{
+	TH0=(65535-50000)/256;
+	TL0=(65535-50000)%256;
+	a++;
+	a1++;
+	if(a==10)
+	{
+		f1=1;
+		a=0;	
+	}
+	if(a1==5)
+	{
+		f4=1;
+		a1=0;
+	}
+	k3_last=k3_know;
+	k3_know=k3;
+	if(k3_last==0&&k3_know==0)
+	{
+		b++;
+		if(b>20)
+			b=20;
+	}
+	if(k3_last==0&&k3_know==1)
+	{
+		if(b>=10)
+			f=1;
+		else
+			f2=1;
+		b=0;
+	}
+
+	k4_last=k4_know;
+	k4_know=k4;
+	if(k4_last==0&&k4_know==0)
+	{
+		b1++;
+		if(b1>20)
+			b1=20;
+	}
+	if(k4_last==0&&k4_know==1)
+	{
+		if(b1>=10)
+			f=0;
+		else
+			f2=0;
+		b1=0;
+	}
+}

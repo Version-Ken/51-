@@ -1,0 +1,106 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+#define time 1000
+sbit k6=P1^5;
+sbit k5=P1^4;
+sbit k7=P1^6;
+sbit k8=P1^7;
+sbit Led0=P0^7;
+sbit fmq=P3^6;
+bit k5_last=1,k5_now=1,k6_last=1,k6_now=1,k7_last=1,k7_now=1,k8_last=1,k8_now=1;
+bit time_ok_flag;
+void scan_key();
+void scan_timer();
+void set_timer();
+uchar count_k6=0;
+uchar time_set_ok;
+uint c=0;
+uchar count=0,second=0;
+bit system_flag;
+void main()
+{
+   TMOD=0X11;
+   set_timer();
+ while(1)
+ {  
+  scan_key();
+  scan_timer();
+  if(time_ok_flag==1)
+  Led0=0;
+ }	 
+}
+void set_timer()
+{
+	TH0=(65536-50000)/256;
+    TL0=(65536-50000)%256;
+    TR0=1;
+}
+void ex_into() interrupt 1
+{
+  set_timer();
+  c++;
+}
+void scan_key()
+{
+ k5_last=k5_now;
+ k5_now=k5;
+ k6_last=k6_now;
+ k6_now=k6;
+ k7_last=k7_now;
+ k7_now=k7;
+ k8_last=k8_now;
+ k8_now=k8;
+ if(k5_last==0&&k5_now==1)
+ {
+  system_flag=0; 
+  TR0=0;
+  count_k6=0;
+ }
+ if(k6_last==0&&k6_now==1&&system_flag==0)
+ {
+  count_k6++;
+ }
+ if(k7_last==0&&k7_now==1&&system_flag==0)
+ {
+  time_set_ok=count_k6;
+ }
+ if(k8_last==0&&k8_now==1)
+ {
+  system_flag=1;
+  set_timer();
+ }
+}
+void scan_timer()
+{
+ if(system_flag==1)
+ {
+  if(TF0==1)
+  {
+   count++;
+   if(count==10)
+   {
+   	second++;
+	count=0;
+	if(second==time_set_ok)
+	{
+	 time_ok_flag=1;
+	}
+	else
+	 time_ok_flag=0;
+   }
+   if(time_ok_flag==0)
+   {
+   	set_timer();
+	TF0=0;
+   }
+  }
+ 
+ }
+
+
+
+
+}

@@ -1,0 +1,129 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar bai,shi,ge;
+sbit b=P3^6;
+uint count,a;
+uchar set_num=8;
+bit b_kaiguan,f;
+sbit k5=P1^4;
+sbit k6=P1^5;
+sbit k7=P1^6;
+bit k5_last=1,k5_now=1;
+bit k6_last=1,k6_now=1;
+bit k7_last=1,k7_now=1;
+void init();
+void fenjie();
+void display();
+void scan_key();
+void main()
+{
+	init();
+	while(1)
+	{
+		scan_key();
+		count=TH0*256+TL0;
+		fenjie();
+		display();
+		if(count%set_num==0&&count!=0)
+		{
+			if(b_kaiguan==0)
+			{
+				b_kaiguan=1;
+				TR1=1;
+			}
+		}
+		else if(f==0)
+		{
+			f=1;
+			b_kaiguan=0;
+		}	
+	}
+}
+void init()
+{
+	TMOD=0X15;
+	TH1=(65536-5000)/256;
+	TL1=(65536-5000)/256;
+	EA=1;
+	ET1=1;
+	TR1=0;
+	TH0=0;
+	TL0=0;
+	TR0=0;
+	lcd_init();
+	lcd_pos(2,7);
+	lcdwrite_zm('S');
+	lcdwrite_zm('T');
+	lcdwrite_zm('O');
+	lcdwrite_zm('P');
+}
+void fenjie()
+{
+	bai=count/100;
+	shi=count%100/10;
+	ge=count%10;
+}
+void display()
+{
+	lcd_pos(1,7);
+	lcdwrite_sz(bai);
+	lcdwrite_sz(shi);
+	lcdwrite_sz(ge);
+}
+void scan_key()
+{
+	k5_last=k5_now;
+	k5_now=k5;
+
+	k6_last=k6_now;
+	k6_now=k6;
+
+	k7_last=k7_now;
+	k7_now=k7;
+	 
+	if(k5_last==0&&k5_now==1)
+	{
+		TR0=1;
+		lcd_init();
+		lcd_pos(2,7);
+		lcdwrite_zm('G');
+		lcdwrite_zm('O');
+	}
+	if(k6_last==0&&k6_now==1)
+	{
+		TR0=0;
+		lcd_init();
+		lcd_pos(2,7);
+		lcdwrite_zm('S');
+		lcdwrite_zm('T');
+		lcdwrite_zm('O');
+		lcdwrite_zm('P');
+	}
+	if(k7_last==0&&k7_now==1)
+	{
+		TR0=0;
+		TH0=0;
+		TL0=0;
+		lcd_init();
+		lcd_pos(2,7);
+		lcdwrite_zm('S');
+		lcdwrite_zm('T');
+		lcdwrite_zm('O');
+		lcdwrite_zm('P');
+	}
+}
+void timer() interrupt 3
+{
+	TH1=(65536-5000)/256;
+	TL1=(65536-5000)/256;
+	b=~b;
+	a++;	
+	if(a==200)
+	{
+		a=0;
+		TR1=0;
+		f=0;			
+	}
+}

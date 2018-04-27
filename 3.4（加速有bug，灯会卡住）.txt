@@ -1,0 +1,110 @@
+#include<reg52.h>
+#include<intrins.h>
+#define uchar unsigned char 
+#define uint unsigned int  
+sbit k1=P3^2;
+sbit k2=P3^3;
+sbit k3=P3^4;
+sbit k5=P1^4;
+sbit k6=P1^5;
+uchar a=0xfe,f=0,c,speed=20;
+void delay(uint z);
+void scan_key();
+void out_put();	
+void main()
+{
+	P0=a;
+	while(1)
+	{
+		scan_key();
+		out_put();
+	}
+}
+void delay(uint z)
+{
+ 	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}
+void scan_key()
+{	
+	k1=1;
+	k2=1;
+	if(k1==0)
+	{
+		delay(20);
+		if(k1==0)
+		{
+			while(k1==0);
+			f=1;
+		}
+
+	}
+	if(k2==0)
+	{
+	 	delay(20);
+		if(k2==0)
+		{
+			while(k2==0);
+			f=0;
+		}
+	}
+	if(k3==0)
+	{
+		delay(20);
+		if(k3==0)
+		{
+			while(k3==0);
+			f=2;
+		}	
+	}
+	if(k5==0)
+	{
+		delay(20);
+		if(k5==0)
+		{
+			while(k5==0);
+			speed++;
+			if(speed>=40)
+				speed=40;	
+		}	
+	}
+	if(k6==0)
+	{
+		delay(20);
+		if(k6==0)
+		{
+			while(k6==0);
+			speed--;
+			if(speed<=1)
+				speed=1;
+		}	
+	}
+	
+}
+void out_put()
+{	
+	if(f==1)
+	{
+
+		delay(20);
+		c++;
+		if(c==speed)
+		{
+			a=_crol_(a,1);
+			P0=a;
+			c=0;
+		}
+	}
+	if(f==2)
+	{
+		delay(20);
+		c++;
+		if(c==speed)
+		{
+			a=_cror_(a,1);
+			P0=a;
+			c=0;
+		}
+	}
+}

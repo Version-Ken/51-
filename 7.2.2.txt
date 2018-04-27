@@ -1,0 +1,46 @@
+#include<reg51.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar a,f;
+sbit b=P3^6;		   
+void timer0();
+void timer1();
+void main()
+{
+	TMOD=0X11;
+	timer0();	 
+	timer1();
+	while(1)
+	{
+		if(TF0==1&&f!=1)
+		{
+			b=~b;
+			TF0=0;
+			timer0();
+		}
+		if(TF1==1)
+		{
+			a++;
+			if(a==20)
+			{
+				f=1;
+				a=0;
+			}
+			TF1=0;
+			timer1();
+		}
+			
+	}
+}
+void timer0()
+{
+	TH0=(65536-10000)/256;
+	TL0=(65536-10000)%256;
+	TR0=1;
+}
+void timer1()
+{
+	TH1=(65536-50000)/256;
+	TL1=(65536-50000)%256;
+	TR1=1;			
+}										

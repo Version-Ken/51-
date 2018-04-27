@@ -1,0 +1,38 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar s=0,a=0xfe;
+void init();
+void delay(uint z);
+void timer0();
+void main()
+{
+	init();
+	while(1)
+	{
+		if(s==1)
+		{
+			a=_crol_(a,1);
+			P0=a;
+			delay(500);
+		}
+	}
+}
+void delay(uint z)
+{
+	uint x,y;
+	for(x=z;x>0;x--)
+		for(y=110;y>0;y--);
+}
+void timer0() interrupt 0
+{
+	s=1;	
+}	 	
+void init()
+{
+	IT0=1;
+	EA=1;
+	EX0=1;
+	P0=a;
+}

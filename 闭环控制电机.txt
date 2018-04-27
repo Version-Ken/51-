@@ -1,0 +1,173 @@
+#include<reg51.h> 
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+#define time 1000
+sbit motor_a=P1^0;
+sbit motor_b=P1^1;
+sbit key_run=P1^4;
+sbit key_stp=P1^7;
+sbit spd_up=P1^5;
+sbit spd_dn=P1^6;
+bit key_run_last=1,key_run_now=1;
+bit key_stp_last=1,key_stp_now=1;
+bit spd_up_last=1,spd_up_now=1;
+bit spd_dn_last=1,spd_dn_now=1;
+uchar set_zkb=0;
+uchar set_spd=15;
+uint sped1,sped2,sped3,avr;
+uchar status;
+uchar count_zq;
+uint sped;
+uint sd_count;
+void int_t0();
+void scan_key();
+void stop();
+void run();
+void display();
+void main()
+{
+	TMOD=0x51;
+	EA=1; 
+	ET0=1;
+	TH1=0;
+	TL1=0;
+	TR1=1;
+	lcd_init();
+	lcd_pos(1,1);
+	lcdwrite_zm('S');
+	lcdwrite_zm('T');
+	lcdwrite_zm('O');
+	lcdwrite_zm('P');
+	while(1)
+	{
+		scan_key();
+		avr=(sped1+sped2+sped3)/3;
+		display();
+	}
+}
+void int_t0() interrupt 1
+{
+	count_zq++;
+	if(count_zq==100)
+	count_zq=0;
+
+	if(count_zq<set_zkb)
+		run();
+
+	else
+		stop();
+
+	sd_count++;
+	if(sd_count==500)
+	{
+	   sd_count=0;
+	   sped=TH1*256+TL1;
+	   sped1=sped2;
+	   sped2=sped3;
+	   sped3=sped;
+	   if(sped<set_spd)
+	   	 set_zkb=set_zkb+(set_spd-sped)/2;
+	    
+	   
+	    if(sped>set_spd)
+	   
+	      set_zkb=set_zkb-(sped-set_spd)/2;
+	   
+	   TH1=0;
+	   TL1=0;
+	}
+
+	TH0=(65536-time)/256;
+	TL0=(65536-time)%256;
+	TR0=1;
+
+
+}
+void scan_key()
+{
+	key_run_last=key_run_now;
+	key_run_now=key_run;
+	key_stp_last=key_stp_now;
+	key_stp_now=key_stp;
+	spd_up_last=spd_up_now;
+	spd_up_now=spd_up;
+	spd_dn_last=spd_dn_now;
+	spd_dn_now=spd_dn;
+	
+	if(key_run_last==0&&key_run_now==1) 
+	{
+		status=1;
+		TH0=(65536-time)/256;
+		TL0=(65536-time)%256;
+		TR0=1;
+		lcd_init();
+		lcd_pos(1,1);
+		lcdwrite_zm('R');
+		lcdwrite_zm('U');
+		lcdwrite_zm('N');	
+	}	
+	if(key_stp_last==0&&key_stp_now==1) 
+	{
+		status=0;
+		TR0=0;
+		stop();
+		lcd_init();
+		lcd_pos(1,1);
+		lcdwrite_zm('S');
+		lcdwrite_zm('T');
+		lcdwrite_zm('O');
+		lcdwrite_zm('P');
+	}			
+	if(spd_up_last==0&&spd_up_now==1) 
+	{
+		set_spd++;
+		if(set_spd>=30)
+		set_spd=30;
+	}				
+	if(spd_dn_last==0&&spd_dn_now==1) 
+	{
+		set_spd--;
+		if(set_spd<=1)
+		set_spd=1;
+	}									
+
+}
+void stop()
+{
+	motor_a=1;
+	motor_b=1;
+}
+void run()
+{
+	motor_a=1;
+	motor_b=0;
+}
+void display()
+{
+	
+	lcd_pos(1,8);
+	lcdwrite_zm('Z');
+	lcdwrite_zm('K');
+	lcdwrite_zm('B');
+	lcdwrite_zm(':');
+	lcdwrite_sz(set_zkb/100);
+	lcdwrite_sz(set_zkb%100/10);
+	lcdwrite_sz(set_zkb%10);	
+	
+	lcd_pos(2,1);
+	lcdwrite_zm('Z');
+	lcdwrite_zm('S');
+	lcdwrite_zm(':');
+	lcdwrite_sz(avr/100);
+	lcdwrite_sz(avr%100/10);
+	lcdwrite_sz(avr%10);
+	
+	lcd_pos(2,9);
+	lcdwrite_zm('S');
+	lcdwrite_zm('D');
+	lcdwrite_zm(':');
+	lcdwrite_sz(set_spd/100);
+	lcdwrite_sz(set_spd%100/10);
+	lcdwrite_sz(set_spd%10);		
+} 

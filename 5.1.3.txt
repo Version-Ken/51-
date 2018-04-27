@@ -1,0 +1,40 @@
+#include<reg51.h>
+#include"1602lcd.h"
+#define uchar unsigned char
+#define uint unsigned int
+uchar table1[]=("How are you?");
+uchar table2[]=("I'm fine thanks.");
+sbit k1=P3^2;
+sbit k2=P3^3;
+void main()
+{
+	lcd_init();
+	lcd_pos(1,3);
+	lcdwrite_string(table1);
+
+	lcd_pos(2,1);
+	lcdwrite_sz(6);
+	lcdwrite_sz(7);
+	lcdwrite_sz(8);
+
+	lcd_pos(2,8);
+	lcdwrite_zm('a');
+	lcdwrite_zm('b');
+	lcdwrite_zm('c');
+
+
+	while(1)
+	{
+		if(k1==0)
+		{
+			lcd_clear();
+		}
+		if(k2==0)
+		{
+			lcd_pos(1,3);
+			lcdwrite_string(table1);
+			lcd_pos(2,1);
+			lcdwrite_string(table2);	
+		}
+	}
+}
